@@ -37,14 +37,19 @@ public class SimilarMovieProcess {
      * @return  movie candidates
      */
     public static List<Movie> candidateGenerator(Movie movie){
+        //使用HashMap去重
         HashMap<Integer, Movie> candidateMap = new HashMap<>();
+        //电影movie包含多个风格标签
         for (String genre : movie.getGenres()){
+            //召回策略的实现
             List<Movie> oneCandidates = DataManager.getInstance().getMoviesByGenre(genre, 100, "rating");
             for (Movie candidate : oneCandidates){
                 candidateMap.put(candidate.getMovieId(), candidate);
             }
         }
+        //去掉movie本身
         candidateMap.remove(movie.getMovieId());
+        //最终的候选集
         return new ArrayList<>(candidateMap.values());
     }
 
@@ -68,11 +73,13 @@ public class SimilarMovieProcess {
             }
         }
 
+        //召回所有电影中排名最高的100部电影
         List<Movie> highRatingCandidates = DataManager.getInstance().getMovies(100, "rating");
         for (Movie candidate : highRatingCandidates){
             candidateMap.put(candidate.getMovieId(), candidate);
         }
 
+        //召回最新上映的100部电影
         List<Movie> latestCandidates = DataManager.getInstance().getMovies(100, "releaseYear");
         for (Movie candidate : latestCandidates){
             candidateMap.put(candidate.getMovieId(), candidate);
@@ -93,6 +100,7 @@ public class SimilarMovieProcess {
             return null;
         }
 
+        //获取所有影片候选集(这里取评分排名前10000的影片作为全部候选集)
         List<Movie> allCandidates = DataManager.getInstance().getMovies(10000, "rating");
         HashMap<Movie,Double> movieScoreMap = new HashMap<>();
         for (Movie candidate : allCandidates){
@@ -103,6 +111,7 @@ public class SimilarMovieProcess {
         List<Map.Entry<Movie,Double>> movieScoreList = new ArrayList<>(movieScoreMap.entrySet());
         movieScoreList.sort(Map.Entry.comparingByValue());
 
+        //生成并返回最终的候选集
         List<Movie> candidates = new ArrayList<>();
         for (Map.Entry<Movie,Double> movieScoreEntry : movieScoreList){
             candidates.add(movieScoreEntry.getKey());

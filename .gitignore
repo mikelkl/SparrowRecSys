@@ -29,3 +29,4 @@ target/
 SparrowRecSys.iml
 TFRecModel.iml
 RecPySpark.iml
+/src/main/resources/webroot/modeldata/neuralcf/002/keras_metadata.pb

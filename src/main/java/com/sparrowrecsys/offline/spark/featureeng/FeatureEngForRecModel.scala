@@ -191,9 +191,11 @@ object FeatureEngForRecModel {
     //generate a smaller sample set for demo
     val smallSamples = samples.sample(0.1).withColumn("timestampLong", col("timestamp").cast(LongType))
 
+    //找到时间切割点
     val quantile = smallSamples.stat.approxQuantile("timestampLong", Array(0.8), 0.05)
     val splitTimestamp = quantile.apply(0)
 
+    //切割样本为训练集和测试集
     val training = smallSamples.where(col("timestampLong") <= splitTimestamp).drop("timestampLong")
     val test = smallSamples.where(col("timestampLong") > splitTimestamp).drop("timestampLong")
 
